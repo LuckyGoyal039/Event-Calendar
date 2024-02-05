@@ -38,7 +38,6 @@ function createCalendar(year, month) {
   let table =
     "<table class='table'><thead><tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr><tr></thead>";
 
-  // spaces for the first row
   // from Monday till the first day of the month
   // * * * 1  2  3  4
   for (let i = 0; i < getDay(d); i++) {
