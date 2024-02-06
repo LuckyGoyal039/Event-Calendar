@@ -10,17 +10,7 @@ function getAllMonths(dateObj) {
   }
   return monthList;
 }
-
-function getAllYear(dateObj) {
-  let startYear = dateObj.getFullYear() - 10;
-  let endYear = dateObj.getFullYear() + 10;
-  let yearOptions;
-  for (let i = startYear; i < endYear; i++) {
-    yearOptions += `<option value=${i}> ${i}  </option>`;
-  }
-  return yearOptions;
-}
-
+// function to getDays without hardcode
 // function getAllDays(dateObj) {
 //   let myDays = "";
 //   for (let i = 1; i <= 7; i++) {
@@ -32,11 +22,42 @@ function getAllYear(dateObj) {
 //   return myDays;
 // }
 
+function getAllYear(dateObj) {
+  let startYear = dateObj.getFullYear() - 10;
+  let endYear = dateObj.getFullYear() + 10;
+  let yearOptions;
+  for (let i = startYear; i < endYear; i++) {
+    yearOptions += `<option value=${i}> ${i}  </option>`;
+  }
+  return yearOptions;
+}
+
+// not working
+// function updateEvent(event, eventList, id) {
+//   console.log(eventList[id]);
+//   if (event.target.tagName === 'SPAN' && event.target.getAttribute('data-toggle') !== 'modal') {
+//     event.target.setAttribute("data-toggle", "modal");
+//     event.target.setAttribute("data-target", "#filledModal");
+//     event.stopPropagation();
+//   }
+// }
+
+function getEventsList(myDate) {
+  let eventList = JSON.parse(localStorage.getItem(myDate));
+  let data = "";
+  for (const id in eventList) {
+    data += `<span class='eventStyle' onclick='updateEvent(event, ${JSON.stringify(
+      eventList
+    )}, ${id})'>${eventList[id].title}</span>`;
+  }
+  return data;
+}
+
 function createCalendar(year, month) {
   let d = new Date(year, month);
 
   let table =
-    "<table class='table'><thead><tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr><tr></thead>";
+    "<table class='table'><thead><tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr><tr class='bg-primary'></thead>";
 
   // from Monday till the first day of the month
   // * * * 1  2  3  4
@@ -46,12 +67,13 @@ function createCalendar(year, month) {
 
   // <td> with actual dates
   while (d.getMonth() == month) {
-    table += `<td data-toggle='modal' data-target='#exampleModal' data-value='${
-      d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()
-    }'
-    onclick="$(this).attr('id', 'active')">${d.getDate()} 
+    let myDate = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+    table += `<td data-toggle='modal' data-target='#exampleModal' data-value='${myDate}'
+    onclick="$(this).attr('id', 'active')"><div><span>${d.getDate()} </span></div>
+    <div class="d-flex flex-column p-1">
+    ${getEventsList(myDate)}
+    </div>
     </td>`;
-    
 
     if (getDay(d) % 7 == 6) {
       // sunday, last day of week - newline
@@ -68,10 +90,8 @@ function createCalendar(year, month) {
       table += "<td></td>";
     }
   }
-
   // close the table
   table += "</tr></table>";
-
   return table;
 }
 
@@ -91,7 +111,9 @@ $(document).ready(function () {
   $("#year").html(yearOptions);
   $("#month").html(monthOptions);
 
+  // get Datys without hardcode
   // $("#days").html(getAllDays(new Date()));
+
   $("#calender").html(
     createCalendar(
       $("#year").find(":selected").val(),
@@ -110,30 +132,56 @@ $(document).ready(function () {
   $("#saveButton").click(function () {
     let currDate = $("#active").data("value");
     $("#active").removeAttr("id");
-    // alert(currDate);
-    prevValue = localStorage.getItem(currDate)
-      ? localStorage.getItem(currDate)
+
+    let prevValue = localStorage.getItem(currDate)
+      ? JSON.parse(localStorage.getItem(currDate))
       : {};
-    console.log("prev", prevValue);
 
-    eventNum = Object.keys(prevValue).length + 1;
-    eventTitle = $("#eventName").val();
-    eventDes = $("#description").val();
-    // console.log(eventDes)
+    let eventNum = Object.keys(prevValue).length + 1;
+    let eventTitle = $("#eventName").val();
+    let eventDes = $("#description").val();
 
-    const newEvent = {};
-    newEvent[eventNum] = { title: eventTitle, description: eventDes };
+    // convert 24 hours format into 12 hours
+    let eventTime = $("#timeStamp").val();
+
+    const newEvent = {
+      title: eventTitle,
+      description: eventDes,
+      timeStamp: eventTime,
+    };
+
     localStorage.setItem(
       currDate,
       JSON.stringify({
         ...prevValue,
-        ...newEvent,
+        [eventNum]: newEvent,
       })
     );
     $("#exampleModal").modal("hide");
     $("#eventName").val("");
     $("#description").val("");
+    $("#timeStamp").val("");
+
+    $("#calender").html(
+      createCalendar(
+        $("#year").find(":selected").val(),
+        $("#month").find(":selected").val()
+      )
+    );
   });
+
+  // unable to detect changes in localstorage
+  // window.addEventListener(
+  //   "storage",
+  //   function (event) {
+  //     if (event.originalEvent.StorageArea === localStorage) {
+  //       alert("thier is update in localStorage");
+  //     }
+  //     alert("hello");
+  //     console.log("change detected");
+  //   },
+  //   false
+  // );
 });
 
-localStorage.clear();
+// localStorage.clear();
