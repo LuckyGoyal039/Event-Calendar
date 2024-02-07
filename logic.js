@@ -33,21 +33,22 @@ function getAllYear(dateObj) {
 }
 
 // not working
-// function updateEvent(event, eventList, id) {
-//   console.log(eventList[id]);
-//   if (event.target.tagName === 'SPAN' && event.target.getAttribute('data-toggle') !== 'modal') {
-//     event.target.setAttribute("data-toggle", "modal");
-//     event.target.setAttribute("data-target", "#filledModal");
-//     event.stopPropagation();
-//   }
-// }
+function updateEvent(event, eventList, id) {
+  console.log(eventList);
+  $("#eventNameFilled").prop("value", eventList[id].title);
+  $("#descriptionFilled").prop("value", eventList[id].description);
+  $("#timeStampFilled").prop("value", eventList[id].timeStamp);
+}
 
 function getEventsList(myDate) {
   let eventList = JSON.parse(localStorage.getItem(myDate));
   let data = "";
   for (const id in eventList) {
     // data += `<span class='eventStyle' onclick='updateEvent(event, ${JSON.stringify( eventList)}, ${id})'
-    data += `<span class='eventStyle'>${eventList[id].title}</span>`;
+    data += `<span  id=${myDate + "_active"} 
+    key=${id} class='eventStyle' onclick='updateEvent(event, ${JSON.stringify(
+      eventList
+    )}, ${id})'>${eventList[id].title}</span>`;
   }
   return data;
 }
@@ -132,7 +133,6 @@ $(document).ready(function () {
 
   $("#saveButton").click(function () {
     let currDate = $("#active").data("value");
-    console.log(currDate);
     $("#active").removeAttr("id");
 
     let prevValue = localStorage.getItem(currDate)
@@ -171,6 +171,45 @@ $(document).ready(function () {
       )
     );
   });
+  
+  $("#deleteButton").click(function () {
+    let currDate = $("#active").data("value");
+    let myObj = JSON.parse(localStorage.getItem(currDate));
+    let eventId = $(`#${currDate}_active`).attr("key");
+    delete myObj[eventId];
+    localStorage.setItem(currDate, JSON.stringify(myObj));
+
+    $("#filledModal").modal("hide");
+    $("#calender").html(
+      createCalendar(
+        $("#year").find(":selected").val(),
+        $("#month").find(":selected").val()
+      )
+    );
+  });
+
+  $("#updateButton").click(function () {
+    let currDate = $("#active").data("value");
+    let myObj = JSON.parse(localStorage.getItem(currDate));
+    let eventId = $(`#${currDate}_active`).attr("key");
+    let eventTitle = $("#eventNameFilled").val();
+    let eventDes = $("#descriptionFilled").val();
+    let eventTime = $("#timeStampFilled").val();
+    myObj[eventId] = {
+      title: eventTitle,
+      description: eventDes,
+      timeStamp: eventTime,
+    };
+    localStorage.setItem(currDate, JSON.stringify(myObj));
+
+    $("#filledModal").modal("hide");
+    $("#calender").html(
+      createCalendar(
+        $("#year").find(":selected").val(),
+        $("#month").find(":selected").val()
+      )
+    );
+  });
 
   // not working check again
   // $("td").on("dblclick", function () {
@@ -184,6 +223,9 @@ $(document).ready(function () {
     $("#exampleModal").modal("show");
     $(this).attr("id", "active");
   });
+  $(document).on("click", "td", function () {
+    $(this).attr("id", "active");
+  });
 
   $(document).on("click", ".eventStyle", function () {
     $("#filledModal").modal("show");
@@ -192,10 +234,10 @@ $(document).ready(function () {
   //   alert("tr double click");
   // });
 
-  $("#exampleModal").on("hide", function () {
-    alert("asjfasf")
-    $("#active").removeAttr("id");
-  });
+  // $("#exampleModal").on("hide", function () {
+  //   alert("asjfasf");
+  //   $("#active").removeAttr("id");
+  // });
   // unable to detect changes in localstorage
   // window.addEventListener(
   //   "storage",
