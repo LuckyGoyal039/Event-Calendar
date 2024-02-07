@@ -46,9 +46,8 @@ function getEventsList(myDate) {
   let eventList = JSON.parse(localStorage.getItem(myDate));
   let data = "";
   for (const id in eventList) {
-    data += `<span class='eventStyle' onclick='updateEvent(event, ${JSON.stringify(
-      eventList
-    )}, ${id})'>${eventList[id].title}</span>`;
+    // data += `<span class='eventStyle' onclick='updateEvent(event, ${JSON.stringify( eventList)}, ${id})'
+    data += `<span class='eventStyle'>${eventList[id].title}</span>`;
   }
   return data;
 }
@@ -68,8 +67,10 @@ function createCalendar(year, month) {
   // <td> with actual dates
   while (d.getMonth() == month) {
     let myDate = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
-    table += `<td data-toggle='modal' data-target='#exampleModal' data-value='${myDate}'
-    onclick="$(this).attr('id', 'active')"><div><span>${d.getDate()} </span></div>
+    table += `<td data-value='${myDate}'>
+    <div>
+    <span>${d.getDate()} </span>
+    </div>
     <div class="d-flex flex-column p-1">
     ${getEventsList(myDate)}
     </div>
@@ -131,6 +132,7 @@ $(document).ready(function () {
 
   $("#saveButton").click(function () {
     let currDate = $("#active").data("value");
+    console.log(currDate);
     $("#active").removeAttr("id");
 
     let prevValue = localStorage.getItem(currDate)
@@ -170,6 +172,30 @@ $(document).ready(function () {
     );
   });
 
+  // not working check again
+  // $("td").on("dblclick", function () {
+  //   alert("hello");
+  //   $("#exampleModal").modal("show");
+  //   $(this).attr("id", "active");
+  // });
+
+  // alternative of above
+  $(document).on("dblclick", "td", function () {
+    $("#exampleModal").modal("show");
+    $(this).attr("id", "active");
+  });
+
+  $(document).on("click", ".eventStyle", function () {
+    $("#filledModal").modal("show");
+  });
+  // $("tr").dblclick(function () {
+  //   alert("tr double click");
+  // });
+
+  $("#exampleModal").on("hide", function () {
+    alert("asjfasf")
+    $("#active").removeAttr("id");
+  });
   // unable to detect changes in localstorage
   // window.addEventListener(
   //   "storage",
