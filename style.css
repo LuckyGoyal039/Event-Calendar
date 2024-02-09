@@ -1,15 +1,18 @@
 #calender {
   table {
-    height: 400px;
+    min-height: 400px;
     font-size: 20px;
   }
 }
 .eventStyle {
-  background-color: #08b454 !important;
-  padding: 3px;
+  display: flex;
+  flex-direction: column;
+  background-color: #91f6a9;
+  padding: 2px;
   max-width: 100px;
   border-radius: 5px;
-  margin-bottom: 10px;
+  margin-bottom: 3px;
+  font-size: small;
 }
 
 .dateInput {
@@ -18,3 +21,34 @@
   justify-content: center;
   gap: 50px;
 }
+
+#month {
+  border: none;
+  font-size: 30px;
+  padding-right: 20px;
+}
+#year {
+  border: none;
+  font-size: 30px;
+  padding-right: 10px;
+}
+
+select {
+  -webkit-appearance: none;
+}
+select:focus {
+  outline: none;
+  border-color: transparent;
+}
+
+.material-symbols-outlined {
+  font-size:small;
+  padding-top: 2px;
+}
+.timer{
+  display:flex;
+  align-items: center;
+}
+/* .hidden{
+  display: none;
+} */

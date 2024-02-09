@@ -32,7 +32,6 @@ function getAllYear(dateObj) {
   return yearOptions;
 }
 
-// not working
 function updateEvent(event, eventList, id) {
   console.log(eventList);
   $("#eventNameFilled").prop("value", eventList[id].title);
@@ -45,15 +44,24 @@ function getEventsList(myDate) {
   let data = "";
   for (const id in eventList) {
     // data += `<span class='eventStyle' onclick='updateEvent(event, ${JSON.stringify( eventList)}, ${id})'
-    data += `<span  id=${myDate + "_active"} 
-    key=${id} class='eventStyle' onclick='updateEvent(event, ${JSON.stringify(
-      eventList
-    )}, ${id})'>${eventList[id].title}</span>`;
+    data += `<span  
+    key=${id} 
+    id=${myDate + "_active"} 
+    class='eventStyle hidden' 
+    onclick='updateEvent(event, ${JSON.stringify(eventList)}, ${id})'>
+    <span>${eventList[id].title}</span>
+    <span class='timer'>
+    <span class='material-symbols-outlined shedule'>schedule</span>
+    <span>${eventList[id].timeStamp}</span>
+    </span>
+    </span>`;
   }
   return data;
 }
 
-function createCalendar(year, month) {
+function createCalendar() {
+  let year = $("#year").find(":selected").val(),
+    month = $("#month").find(":selected").val();
   let d = new Date(year, month);
 
   let table =
@@ -72,7 +80,7 @@ function createCalendar(year, month) {
     <div>
     <span>${d.getDate()} </span>
     </div>
-    <div class="d-flex flex-column p-1">
+    <div class="d-flex flex-column p-1 eventBox" >
     ${getEventsList(myDate)}
     </div>
     </td>`;
@@ -116,19 +124,9 @@ $(document).ready(function () {
   // get Datys without hardcode
   // $("#days").html(getAllDays(new Date()));
 
-  $("#calender").html(
-    createCalendar(
-      $("#year").find(":selected").val(),
-      $("#month").find(":selected").val()
-    )
-  );
+  $("#calender").html(createCalendar());
   $("#year, #month").change(function () {
-    $("#calender").html(
-      createCalendar(
-        $("#year").find(":selected").val(),
-        $("#month").find(":selected").val()
-      )
-    );
+    $("#calender").html(createCalendar());
   });
 
   $("#saveButton").click(function () {
@@ -164,14 +162,9 @@ $(document).ready(function () {
     $("#description").val("");
     $("#timeStamp").val("");
 
-    $("#calender").html(
-      createCalendar(
-        $("#year").find(":selected").val(),
-        $("#month").find(":selected").val()
-      )
-    );
+    $("#calender").html(createCalendar());
   });
-  
+
   $("#deleteButton").click(function () {
     let currDate = $("#active").data("value");
     let myObj = JSON.parse(localStorage.getItem(currDate));
@@ -180,12 +173,7 @@ $(document).ready(function () {
     localStorage.setItem(currDate, JSON.stringify(myObj));
 
     $("#filledModal").modal("hide");
-    $("#calender").html(
-      createCalendar(
-        $("#year").find(":selected").val(),
-        $("#month").find(":selected").val()
-      )
-    );
+    $("#calender").html(createCalendar());
   });
 
   $("#updateButton").click(function () {
@@ -230,14 +218,11 @@ $(document).ready(function () {
   $(document).on("click", ".eventStyle", function () {
     $("#filledModal").modal("show");
   });
-  // $("tr").dblclick(function () {
-  //   alert("tr double click");
-  // });
+  // $(".eventBox span").slice(1).hide();
+  // $(".eventBox").append('<div>Hello world');
 
-  // $("#exampleModal").on("hide", function () {
-  //   alert("asjfasf");
-  //   $("#active").removeAttr("id");
-  // });
+
+
   // unable to detect changes in localstorage
   // window.addEventListener(
   //   "storage",
